@@ -1,15 +1,27 @@
 import React  from "react";
-import axios from "axios";
 import {useHistory} from "react-router-dom";
-
+import axios from "axios";
 
 const Main = () => {
     const routerHistory = useHistory();
+    const[currentUser, setCurrentUser] = React.useState(null);
+    const instance = axios.create({
+        baseURL: 'http://localhost:8080',
+        timeout: 1000,
+        headers: {'Authorization': 'Bearer '+ localStorage.getItem("access_token"),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    });
 
+    const getLoggedUser = () => {
+        instance.get("api/auth/me").then(res =>{
+            if(!res.status === 200){
+                return "Failed"
+            }
 
-    const getSingleUser = () => {
-        axios.get("http://localhost:8080/api/auth/me").then(res => {
-            console.log(res)
+            setCurrentUser(res.data)
+            console.log(currentUser)
         })
     }
 
@@ -23,7 +35,7 @@ const Main = () => {
                 hello secured
             </div>
             <button onClick={onLogout}>Log out</button>
-            <button onClick={getSingleUser}>Me</button>
+            <button onClick={getLoggedUser}>Me</button>
         </div>
     )
 }
